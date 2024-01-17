@@ -33,7 +33,7 @@ Ensure you have the following dependencies installed before running the script:
 2. Run the script:
 
    ```bash
-   node index.js
+   node running.js
    ```
 
    The script will launch a headless browser, perform the Google Maps search, and scrape relevant business information.
