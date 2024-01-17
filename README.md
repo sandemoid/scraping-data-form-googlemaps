@@ -24,7 +24,7 @@ Ensure you have the following dependencies installed before running the script:
 
 ## Usage
 
-1. Open the `index.js` file and update the `query` variable with your desired search query:
+1. Open the `running.js` file and update the `query` variable with your desired search query:
 
    ```javascript
    const query = "Dealer Mobil di Palembang";
