@@ -11,34 +11,34 @@ Ensure you have the following dependencies installed before running the script:
 
 1. Clone this repository:
 
-    ```bash
-    git clone https://github.com/SeptiawanAjiP/google-maps-scrapping.git
-    cd your-repo
-    ```
+   ```bash
+   git clone https://github.com/sandemoid/scraping-data-form-googlemaps
+   cd your-repo
+   ```
 
 2. Install the required npm packages:
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 ## Usage
 
 1. Open the `index.js` file and update the `query` variable with your desired search query:
 
-    ```javascript
-    const query = "Laundry di Jakarta";
-    ```
+   ```javascript
+   const query = "Dealer Mobil di Palembang";
+   ```
 
 2. Run the script:
 
-    ```bash
-    node index.js
-    ```
+   ```bash
+   node index.js
+   ```
 
-    The script will launch a headless browser, perform the Google Maps search, and scrape relevant business information.
+   The script will launch a headless browser, perform the Google Maps search, and scrape relevant business information.
 
-3. The scraped data will be saved in a CSV file named `places.csv` in the project directory.
+3. The scraped data will be saved in a JSON file named `places.json` in the project directory.
 
 ## Acknowledgments
 
