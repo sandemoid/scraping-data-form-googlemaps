@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import puppeteerExtra from "puppeteer-extra";
 import stealthPlugin from "puppeteer-extra-plugin-stealth";
-import { createObjectCsvWriter } from 'csv-writer';
+import fs from 'fs';
 
 init();
 
@@ -13,14 +13,12 @@ async function searchGoogleMaps() {
 
     const browser = await puppeteerExtra.launch({
       headless: false,
-      // headless: "new",
-      // devtools: true,
       executablePath: "", // your path here
     });
 
     const page = await browser.newPage();
 
-    const query = "Toko Bangunan Jakarta";
+    const query = "Dealer Mobil di Palembang";
 
     try {
       await page.goto(
@@ -48,14 +46,11 @@ async function searchGoogleMaps() {
               totalHeight = 0;
               await new Promise((resolve) => setTimeout(resolve, scrollDelay));
 
-              // Calculate scrollHeight after waiting
               var scrollHeightAfter = wrapper.scrollHeight;
 
               if (scrollHeightAfter > scrollHeightBefore) {
-                // More content loaded, keep scrolling
                 return;
               } else {
-                // No more content loaded, stop scrolling
                 clearInterval(timer);
                 resolve();
               }
@@ -74,7 +69,6 @@ async function searchGoogleMaps() {
     await browser.close();
     console.log("browser closed");
 
-    // get all a tag parent where a tag href includes /maps/place/
     const $ = cheerio.load(html);
     const aTags = $("a");
     const parents = [];
@@ -90,29 +84,25 @@ async function searchGoogleMaps() {
 
     console.log("parents", parents.length);
 
-    const buisnesses = [];
+    const businesses = [];
     let index = 0;
 
     parents.forEach((parent) => {
       const url = parent.find("a").attr("href");
-      // get a tag where data-value="Website"
       const website = parent.find('a[data-value="Website"]').attr("href");
-      // find a div that includes the class fontHeadlineSmall
       const storeName = parent.find("div.fontHeadlineSmall").text();
-      // find span that includes class fontBodyMedium
       const ratingText = parent
         .find("span.fontBodyMedium > span")
         .attr("aria-label");
 
-      // get the first div that includes the class fontBodyMedium
       const bodyDiv = parent.find("div.fontBodyMedium").first();
       const children = bodyDiv.children();
       const lastChild = children.last();
       const firstOfLast = lastChild.children().first();
       const lastOfLast = lastChild.children().last();
       index = index + 1;
-      
-      buisnesses.push({
+
+      businesses.push({
         index,
         storeName,
         placeId: `ChI${url?.split("?")?.[0]?.split("ChI")?.[1]}`,
@@ -139,7 +129,7 @@ async function searchGoogleMaps() {
 
     console.log(`time in seconds ${Math.floor((end - start) / 1000)}`);
 
-    return buisnesses;
+    return businesses;
   } catch (error) {
     console.log("error at googleMaps", error.message);
   }
@@ -147,28 +137,15 @@ async function searchGoogleMaps() {
 
 async function init() {
   try {
-    const places = await searchGoogleMaps();
+    const businesses = await searchGoogleMaps();
 
-    const csvWriter = createObjectCsvWriter({
-      path: 'places.csv',
-      header: [
-        { id: 'index', title: 'Index'},
-        { id: 'storeName', title: 'Store Name' },
-        { id: 'address', title: 'Address' },
-        { id: 'category', title: 'Category' },
-        { id: 'phone', title: 'Phone' },
-        { id: 'googleUrl', title: 'Google URL' },
-        { id: 'bizWebsite', title: 'Business Website' },
-        { id: 'ratingText', title: 'Rating Text' },
-        { id: 'stars', title: 'Stars' },
-        { id: 'numberOfReviews', title: 'Number of Reviews' },
-      ],
-    });
+    // Convert businesses array to JSON string
+    const jsonData = JSON.stringify(businesses, null, 2);
 
-    // Write the places data to the CSV file
-    await csvWriter.writeRecords(places);
+    // Write the JSON data to a file
+    fs.writeFileSync('places.json', jsonData, 'utf-8');
 
-    console.log('CSV file created successfully.');
+    console.log('JSON file created successfully.');
   } catch (error) {
     console.log('Error in init:', error.message);
   }
